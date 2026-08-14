@@ -307,7 +307,12 @@ function renderCategories(filterQuery = '') {
     
     // Calculate total listings count in this section
     const totalListingsInSec = categoriesInSec.reduce((acc, cat) => {
-      const count = cat.count !== undefined ? cat.count : globalListings.filter(l => l.category_id == cat.id).length;
+      let count = globalListings.filter(l => l.category_id == cat.id).length;
+      if (cat.slug === 'blood-donor' || cat.slug === 'blood-donors' || cat.name_bn.includes('ডোনার') || cat.name_bn.includes('রক্তদাতা')) {
+        count = globalDonors.length;
+      } else if (cat.count !== undefined) {
+        count = cat.count;
+      }
       return acc + count;
     }, 0);
 
