@@ -932,7 +932,7 @@ async function handleAddDonorSubmit(e) {
   const village = document.getElementById('admin-donor-village').value.trim();
 
   if (!name || !blood_group || !phone || !union_name) {
-    alert('অনুগ্রহ করে নাম, রক্তের গ্রুপ, মোবাইল নম্বর এবং ইউনিয়ন ঘরগুলো পূরণ করুন।');
+    alert('অনুগ্রহ করে নাম, রক্তের গ্রুপ, মোবাইল নম্বর এবং ইউনিয়ন ঘরগুলো পূরণ করুন.');
     return;
   }
 
@@ -994,29 +994,12 @@ async function handleAddDonorSubmit(e) {
 
     const result = await res.json();
     if (result.status === 'success') {
-      alert('নতুন রক্তদাতা সফলভাবে যুক্ত করা হয়েছে!');
+      alert('নতুন রক্তদাতা সফলভাবে ডাটাবেজে যুক্ত করা হয়েছে!');
       closeModal('add-donor-modal');
-
-      const newDonor = {
-        id: result.id || Date.now(),
-        name,
-        blood_group,
-        phone,
-        division,
-        district,
-        upazila,
-        union_name,
-        village,
-        image: imageUrl,
-        is_ready: 1
-      };
-
-      globalDonors.unshift(newDonor);
+      await loadData();
       renderAdminMetrics();
       selectAdminCategory('blood_donors');
-      if (typeof renderDonorDirectory === 'function') {
-        renderDonorDirectory('all');
-      }
+      return;
     } else {
       alert(result.message || 'রক্তদাতা যুক্ত করতে সমস্যা হয়েছে!');
     }
@@ -1061,14 +1044,17 @@ async function deleteDonorItem(id) {
       body: JSON.stringify({ token: adminToken, password: 'admin123', id })
     });
     const result = await res.json();
-    alert(result.message || 'রক্তদাতার তথ্য মুছে ফেলা হয়েছে');
+    if (result.status === 'success') {
+      alert('রক্তদাতার তথ্য সফলভাবে ডাটাবেজ থেকে মুছে ফেলা হয়েছে');
+      await loadData();
+    } else {
+      globalDonors = globalDonors.filter(d => d.id != id);
+      localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
+    }
   } catch (err) {
-    alert('রক্তদাতার তথ্য সফলভাবে মুছে ফেলা হয়েছে');
+    globalDonors = globalDonors.filter(d => d.id != id);
+    localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
   }
-
-  globalDonors = globalDonors.filter(d => d.id != id);
-  localStorage.setItem('as_has_loaded_db', 'true');
-  localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
 
   renderAdminMetrics();
   selectAdminCategory('blood_donors');

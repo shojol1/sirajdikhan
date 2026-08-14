@@ -52,32 +52,21 @@ async function loadData() {
     `;
   }
 
-  // Load custom local cache first
-  const cachedSliders = localStorage.getItem('as_sliders_cache');
-  if (cachedSliders !== null) {
-    try { globalSliders = JSON.parse(cachedSliders); } catch(e){}
-  }
-  const cachedListings = localStorage.getItem('as_listings_cache');
-  if (cachedListings !== null) {
-    try { globalListings = JSON.parse(cachedListings); } catch(e){}
-  }
-  const cachedDonors = localStorage.getItem('as_donors_cache');
-  if (cachedDonors !== null) {
-    try { globalDonors = JSON.parse(cachedDonors); } catch(e){}
-  }
-
   try {
     const res = await fetch('api/get_data.php');
     const data = await res.json();
 
     if (data.status === 'success') {
       globalCategories = data.categories || [];
-      if (data.listings && data.listings.length > 0 && !cachedListings) globalListings = data.listings;
-      if (data.sliders && data.sliders.length > 0 && !cachedSliders) globalSliders = data.sliders;
-      if (Array.isArray(data.donors) && data.donors.length > 0 && !cachedDonors) globalDonors = data.donors;
-      if (data.blood_requests) globalBloodRequests = data.blood_requests;
+      globalListings = data.listings || [];
+      globalSliders = data.sliders || [];
+      globalDonors = Array.isArray(data.donors) ? data.donors : [];
+      globalBloodRequests = data.blood_requests || [];
 
       localStorage.setItem('as_has_loaded_db', 'true');
+      localStorage.setItem('as_sliders_cache', JSON.stringify(globalSliders));
+      localStorage.setItem('as_listings_cache', JSON.stringify(globalListings));
+      localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
 
       renderSlider();
       renderUrgentNotice();
