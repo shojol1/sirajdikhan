@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>রক্তদাতা ডিরেক্টরি | আমার সিরাজদিখান</title>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    .donors-page-hero {
+      background: linear-gradient(135deg, #be123c, #881337);
+      color: #ffffff;
+      padding: 40px 20px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(190, 18, 60, 0.25);
+    }
+    .donors-page-hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .donors-page-hero p {
+      font-size: 1rem;
+      opacity: 0.92;
+      max-width: 650px;
+      margin: 0 auto 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="display:flex; flex-direction:column; min-height:100vh;">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="glass-header">
+      <div class="container navbar">
+        <a href="index.php" class="brand-logo">
+          <div class="brand-logo-icon" style="background:var(--blood-light); color:var(--blood-red);">
+            <i class="fa-solid fa-droplet"></i>
+          </div>
+          <div>
+            <div class="brand-title">আমার সিরাজদিখান</div>
+            <div class="brand-subtitle">রক্তদাতা ডিরেক্টরি পোর্টাল</div>
+          </div>
+        </a>
+
+        <div class="nav-actions">
+          <a href="index.php" class="btn btn-outline" style="border-radius: 10px;">
+            <i class="fa-solid fa-house"></i> হোম পেজে যান
+          </a>
+          <button onclick="toggleTheme()" class="theme-toggle-btn" title="থিম পরিবর্তন করুন">
+            <i class="fa-solid fa-moon" id="theme-icon"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="container" style="flex-grow: 1; padding-top: 20px;">
+
+      <!-- HERO BANNER -->
+      <div class="donors-page-hero">
+        <h1><i class="fa-solid fa-hand-holding-medical"></i> সিরাজদিখান উপজেলা রক্তদাতা ডিরেক্টরি</h1>
+        <p>জরুরী প্রয়োজনে সিরাজদিখান উপজেলার রক্তদাতাদের সরাসরি মোবাইল বা হোয়াটসঅ্যাপে যোগাযোগ করে রক্ত সংগ্রহ করুন</p>
+        
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <a href="https://ourbrs.org" target="_blank" class="btn" style="background:#ffffff; color:var(--blood-red); font-weight:700; border-radius:10px; padding:10px 20px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-plus-circle"></i> রক্তদাতা হতে নিবন্ধন করুন
+          </a>
+          <a href="https://ourbrs.org" target="_blank" class="btn" style="background:rgba(255,255,255,0.2); color:#ffffff; font-weight:600; border-radius:10px; padding:10px 20px; border:1px solid rgba(255,255,255,0.4); text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-bullhorn"></i> জরুরী রক্তের আবেদন পোস্ট
+          </a>
+        </div>
+      </div>
+
+      <!-- BLOOD DONORS SECTION -->
+      <section class="blood-directory-section" style="margin-bottom: 40px;">
+        <div class="blood-directory-card">
+          <div class="blood-filter-bar">
+            <span class="blood-filter-label"><i class="fa-solid fa-filter"></i> ব্লাড গ্রুপ সিলেক্ট করুন:</span>
+            <div class="blood-groups-flex">
+              <button class="bg-chip active" onclick="renderDonorDirectory('all', this)">সকল রক্তদাতা</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('A+', this)">A+</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('A-', this)">A-</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('B+', this)">B+</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('B-', this)">B-</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('O+', this)">O+</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('O-', this)">O-</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('AB+', this)">AB+</button>
+              <button class="bg-chip" onclick="renderDonorDirectory('AB-', this)">AB-</button>
+            </div>
+          </div>
+
+          <!-- DONORS GRID -->
+          <div id="donors-directory-grid" class="donor-grid">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <div class="footer-title">আমার সিরাজদিখান</div>
+            <p>সিরাজদিখান উপজেলার নাগরিক সেবা সহজীকরণ ও ডিজিটাল বাংলাদেশ গঠনে একটি স্বেচ্ছাসেবী ডিজিটাল উদ্যোগ।</p>
+          </div>
+          <div>
+            <div class="footer-title">জরুরী লিংক</div>
+            <ul style="list-style:none;">
+              <li style="margin-bottom:6px;"><a href="tel:01700717140" style="color:#cbd5e1; text-decoration:none;">ইউএনও অফিস</a></li>
+              <li style="margin-bottom:6px;"><a href="tel:01320115500" style="color:#cbd5e1; text-decoration:none;">সিরাজদিখান থানা</a></li>
+              <li style="margin-bottom:6px;"><a href="tel:01711002233" style="color:#cbd5e1; text-decoration:none;">ফায়ার সার্ভিস</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          &copy; ২০২৬ আমার সিরাজদিখান পোর্টাল। সর্বস্বত্ব সংরক্ষিত।
+        </div>
+      </div>
+    </footer>
+
+    <!-- MOBILE BOTTOM NAV BAR -->
+    <div class="bottom-nav-bar">
+      <a href="index.php" class="b-nav-item">
+        <i class="fa-solid fa-house"></i>
+        <span>হোম</span>
+      </a>
+      <a href="donors.php" class="b-nav-item active" style="color:var(--blood-red);">
+        <i class="fa-solid fa-droplet"></i>
+        <span>রক্তদান</span>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- BLOOD DONOR DETAILS MODAL (POPUP) -->
+  <div id="donor-details-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 460px; padding: 0; overflow: hidden; border-radius: 16px;">
+      <div style="position: relative; background: linear-gradient(135deg, #1e293b, #0f172a); text-align: center; padding: 28px 20px 18px 20px;">
+        <button onclick="closeModal('donor-details-modal')" class="modal-close-btn" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.2); color: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <div id="modal-donor-avatar-container" style="margin: 0 auto 10px auto; width: 110px; height: 110px;"></div>
+        <h2 id="modal-donor-name" style="color: #ffffff; font-size: 1.35rem; margin-bottom: 6px; font-weight: 700;"></h2>
+        <div id="modal-donor-blood-tag" style="display: inline-block;"></div>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px;">
+        <div style="display: grid; gap: 10px; font-size: 0.95rem;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-phone fa-lg" style="color: var(--primary-emerald);"></i>
+            <div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">মোবাইল নম্বর</div>
+              <strong id="modal-donor-phone" style="font-size: 1.1rem; color: var(--text-main);"></strong>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-location-dot fa-lg" style="color: var(--blood-red); margin-top: 4px;"></i>
+            <div style="flex: 1;">
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;">ঠিকানা</div>
+              <div id="modal-donor-address-details" style="color: var(--text-main); font-size: 0.92rem; line-height: 1.6;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px;">
+          <a id="modal-donor-call-btn" href="#" class="action-btn-call" style="background: var(--blood-red); padding: 12px; border-radius: 10px; font-weight: 600; text-align: center; text-decoration: none; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fa-solid fa-phone"></i> সরাসরি কল
+          </a>
+          <a id="modal-donor-wa-btn" href="#" target="_blank" class="action-btn-wa" style="padding: 12px; border-radius: 10px; font-weight: 600; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fa-brands fa-whatsapp"></i> হোয়াটসঅ্যাপ
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTER DONOR MODAL -->
+  <div id="donor-register-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-hand-holding-medical" style="color:var(--blood-red);"></i> রক্তদাতা নাম নিবন্ধন</div>
+        <button onclick="closeModal('donor-register-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleDonorSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">আপনার নাম *</label>
+            <input type="text" name="name" class="form-control" required placeholder="আপনার পূর্ণ নাম">
+          </div>
+          <div class="form-group">
+            <label class="form-label">আপনার ব্লাড গ্রুপ *</label>
+            <select name="blood_group" class="form-control" required>
+              <option value="">-- নির্বাচন করুন --</option>
+              <option value="A+">A+</option><option value="A-">A-</option>
+              <option value="B+">B+</option><option value="B-">B-</option>
+              <option value="O+">O+</option><option value="O-">O-</option>
+              <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">মোবাইল নম্বর *</label>
+            <input type="tel" name="phone" class="form-control" required placeholder="017XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ইউনিয়ন নির্বাচন করুন *</label>
+            <select name="union_name" class="form-control" required>
+              <option value="সিরাজদিখান সদর">সিরাজদিখান সদর</option>
+              <option value="রাজানগর">রাজানগর</option>
+              <option value="শেখরনগর">শেখরনগর</option>
+              <option value="মালখানগর">মালখানগর</option>
+              <option value="কোলা">কোলা</option>
+              <option value="বালুচর">বালুচর</option>
+              <option value="বয়রাগাদী">বয়রাগাদী</option>
+              <option value="রশুনিয়া">রশুনিয়া</option>
+              <option value="কেয়াইন">কেয়াইন</option>
+              <option value="বাসাইল">বাসাইল</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">গ্রাম / এলাকা (যদি থাকে)</label>
+            <input type="text" name="village" class="form-control" placeholder="যেমন: নয়ানগর, মধ্যপাড়া ইত্যাদি">
+          </div>
+          <div class="form-group">
+            <label class="form-label">সর্বশেষ রক্তদানের তারিখ (যদি দিয়ে থাকেন)</label>
+            <input type="date" name="last_donated_date" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">
+            <i class="fa-solid fa-check"></i> নিবন্ধন সম্পন্ন করুন
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- URGENT BLOOD REQUEST MODAL -->
+  <div id="blood-request-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-bullhorn" style="color:var(--blood-red);"></i> জরুরী রক্তের আবেদন করুন</div>
+        <button onclick="closeModal('blood-request-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleBloodRequestSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">রোগীর নাম *</label>
+            <input type="text" name="patient_name" class="form-control" required placeholder="রোগীর নাম">
+          </div>
+          <div class="form-group">
+            <label class="form-label">রক্তের গ্রুপ *</label>
+            <select name="blood_group" class="form-control" required>
+              <option value="">-- নির্বাচন করুন --</option>
+              <option value="A+">A+</option><option value="A-">A-</option>
+              <option value="B+">B+</option><option value="B-">B-</option>
+              <option value="O+">O+</option><option value="O-">O-</option>
+              <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">কত ব্যাগ প্রয়োজন? *</label>
+            <input type="number" name="units" class="form-control" value="1" min="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">হাসপাতালের নাম ও ঠিকানা *</label>
+            <input type="text" name="hospital" class="form-control" required placeholder="যেমন: সিরাজদিখান হাসপাতাল">
+          </div>
+          <div class="form-group">
+            <label class="form-label">যোগাযোগের মোবাইল নম্বর *</label>
+            <input type="tel" name="phone" class="form-control" required placeholder="017XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">কবে রক্ত প্রয়োজন?</label>
+            <input type="text" name="needed_date" class="form-control" placeholder="যেমন: আজই জরুরী">
+          </div>
+          <button type="submit" class="btn btn-blood" style="width:100%; margin-top:10px;">
+            <i class="fa-solid fa-paper-plane"></i> আবেদন পোস্ট করুন
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      if (typeof loadData === 'function') {
+        await loadData();
+      }
+      renderDonorDirectory('all');
+    });
+  </script>
+</body>
+</html>

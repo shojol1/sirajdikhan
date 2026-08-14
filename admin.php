@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অ্যাডমিন পোর্টাল | আমার সিরাজদিখান</title>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: var(--bg-primary);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Hind Siliguri', 'Outfit', sans-serif;
+    }
+    .admin-standalone-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 60%);
+    }
+    .admin-standalone-login {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 40px 32px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STANDALONE ADMIN LOGIN VIEW -->
+  <div id="admin-standalone-login-view" class="admin-standalone-wrapper">
+    <div class="admin-standalone-login">
+      <div style="width: 75px; height: 75px; background: rgba(37, 99, 235, 0.1); color: var(--royal-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 16px auto;">
+        <i class="fa-solid fa-user-lock"></i>
+      </div>
+      <h2 style="font-size: 1.6rem; margin-bottom: 6px; font-weight: 700; color: var(--text-main);">অ্যাডমিন কন্ট্রোল সেন্টার</h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 26px;">আমার সিরাজদিখান পোর্টালে প্রবেশের জন্য পাসওয়ার্ড দিন</p>
+
+      <form onsubmit="handleAdminStandaloneLogin(event)">
+        <div class="form-group" style="text-align: left; margin-bottom: 22px;">
+          <label class="form-label" style="font-weight: 600;">সিকিউরিটি পাসওয়ার্ড <span style="color: var(--blood-red);">*</span></label>
+          <input type="password" id="admin-standalone-pass" class="form-control" placeholder="পাসওয়ার্ড লিখুন" required style="padding: 12px 14px; font-size: 1rem; border-radius: 10px;">
+          <small style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:6px;">ডিফল্ট পাসওয়ার্ড: admin123</small>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; background: var(--royal-blue); border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+          <i class="fa-solid fa-right-to-bracket"></i> ড্যাশবোর্ডে প্রবেশ করুন
+        </button>
+      </form>
+
+      <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+        <a href="index.php" style="color: var(--text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="fa-solid fa-arrow-left"></i> মূল ওয়েবসাইটে ফিরে যান
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY-DRIVEN PROFESSIONAL ADMIN DASHBOARD MODAL -->
+  <div id="admin-dashboard-modal" class="modal-overlay">
+    <div class="modal-box admin-modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-sliders" style="color:var(--primary-emerald);"></i> আমার সিরাজদিখান - অ্যাডমিন কন্ট্রোল সেন্টার</div>
+        <div>
+          <button onclick="logoutAdminStandalone()" class="btn btn-outline" style="padding:5px 12px; font-size:0.85rem; margin-right:8px;">
+            <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+          </button>
+          <button onclick="window.location.href='index.php'" class="modal-close-btn" style="display:inline-flex;" title="মূল ওয়েবসাইটে যান"><i class="fa-solid fa-house"></i></button>
+        </div>
+      </div>
+      <div class="modal-body">
+
+        <!-- Metrics Cards Header -->
+        <div class="admin-kpi-grid">
+          <div class="admin-kpi-card">
+            <div class="kpi-icon" style="background:var(--primary-light); color:var(--primary-emerald);"><i class="fa-solid fa-layer-group"></i></div>
+            <div>
+              <div class="kpi-val" id="kpi-total-cats">52</div>
+              <div class="kpi-lbl">মোট ক্যাটাগরি</div>
+            </div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-icon" style="background:var(--royal-light); color:var(--royal-blue);"><i class="fa-solid fa-database"></i></div>
+            <div>
+              <div class="kpi-val" id="kpi-total-items">0</div>
+              <div class="kpi-lbl">মোট সেবা এন্ট্রি</div>
+            </div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-icon" style="background:var(--blood-light); color:var(--blood-red);"><i class="fa-solid fa-hand-holding-medical"></i></div>
+            <div>
+              <div class="kpi-val" id="kpi-total-donors">0</div>
+              <div class="kpi-lbl">নিবন্ধিত ডোনার</div>
+            </div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-icon" style="background:var(--amber-light); color:var(--amber-gold);"><i class="fa-solid fa-droplet"></i></div>
+            <div>
+              <div class="kpi-val" id="kpi-total-requests">0</div>
+              <div class="kpi-lbl">জরুরী রিকুয়েস্ট</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Split Layout: Left Sidebar Category Selector + Right Main Panel -->
+        <div class="admin-workspace-split">
+          
+          <!-- Sidebar -->
+          <div class="admin-sidebar-panel">
+            <div class="admin-sidebar-title">
+              <span><i class="fa-solid fa-filter"></i> ক্যাটাগরি বাছুন</span>
+            </div>
+            <input type="text" oninput="filterAdminSidebar(this.value)" placeholder="ক্যাটাগরি ফিল্টার..." class="admin-cat-search">
+            
+            <div id="admin-cat-sidebar-list" class="admin-cat-list">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
+          <!-- Main Work Panel -->
+          <div class="admin-main-panel">
+            <div class="admin-panel-header">
+              <div class="admin-active-title" id="admin-main-active-title">ক্যাটাগরি তথ্য</div>
+              <div id="admin-main-action-btn"></div>
+            </div>
+
+            <div id="admin-main-content-area">
+              <!-- Selected Category Items List / Form -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Listing Modal -->
+  <div id="admin-add-listing-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-plus-circle" style="color:var(--primary-emerald);"></i> নতুন সদস্য বা তথ্য যুক্ত করুন</div>
+        <button onclick="closeModal('admin-add-listing-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleAddListingSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">ক্যাটাগরি *</label>
+            <select name="category_id" id="admin-category-select" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">নাম / প্রতিষ্ঠানের নাম *</label>
+            <input type="text" name="name" class="form-control" required placeholder="যেমন: মোঃ জহিরুল ইসলাম">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">ফোন নম্বর *</label>
+              <input type="tel" name="phone" class="form-control" required placeholder="017XXXXXXXX">
+            </div>
+            <div class="form-group">
+              <label class="form-label">হোয়াটসঅ্যাপ নম্বর</label>
+              <input type="tel" name="whatsapp" class="form-control" placeholder="017XXXXXXXX">
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">অবস্থান / ইউনিয়ন</label>
+              <input type="text" name="location" class="form-control" placeholder="যেমন: রাজানগর, সিরাজদিখান">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ব্যাজ / ট্যাগ</label>
+              <input type="text" name="badge" class="form-control" placeholder="যেমন: Verified / 24/7">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">সদস্যের ছবি/লোগো (ডিভাইস থেকে ফাইল বাছুন)</label>
+            <input type="file" accept="image/*" class="form-control" style="padding:8px;" onchange="handleDeviceFileUpload(this, 'add-image-url', 'add-image-preview')">
+            <input type="text" name="image" id="add-image-url" class="form-control" style="margin-top:6px;" placeholder="অথবা সরাসরি ছবির URL লিখুন">
+            <div id="add-image-preview"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">বিস্তারিত বিবরণ</label>
+            <textarea name="description" class="form-control" placeholder="পদবী, কাজের সময়সূচী ইত্যাদি বিবরণ..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">
+            <i class="fa-solid fa-floppy-disk"></i> ডাটাবেজে সংরক্ষণ করুন
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Listing Modal -->
+  <div id="admin-edit-listing-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-pen-to-square" style="color:var(--royal-blue);"></i> তথ্য সম্পাদনা (Edit Item)</div>
+        <button onclick="closeModal('admin-edit-listing-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleEditListingSubmit(event)">
+          <input type="hidden" name="id" id="edit-listing-id">
+          <div class="form-group">
+            <label class="form-label">ক্যাটাগরি *</label>
+            <select name="category_id" id="edit-category-select" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">নাম / প্রতিষ্ঠানের নাম *</label>
+            <input type="text" name="name" id="edit-name" class="form-control" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">ফোন নম্বর *</label>
+              <input type="tel" name="phone" id="edit-phone" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">হোয়াটসঅ্যাপ নম্বর</label>
+              <input type="tel" name="whatsapp" id="edit-whatsapp" class="form-control">
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">অবস্থান / ইউনিয়ন</label>
+              <input type="text" name="location" id="edit-location" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ব্যাজ / ট্যাগ</label>
+              <input type="text" name="badge" id="edit-badge" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">সদস্যের ছবি/লোগো (ডিভাইস থেকে ফাইল বাছুন)</label>
+            <input type="file" accept="image/*" class="form-control" style="padding:8px;" onchange="handleDeviceFileUpload(this, 'edit-image', 'edit-image-preview')">
+            <input type="text" name="image" id="edit-image" class="form-control" style="margin-top:6px;" placeholder="অথবা ছবির URL লিখুন">
+            <div id="edit-image-preview"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">বিস্তারিত বিবরণ</label>
+            <textarea name="description" id="edit-description" class="form-control"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; background:var(--royal-blue);">
+            <i class="fa-solid fa-check-double"></i> পরিবর্তনসমূহ আপডেট করুন
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Slider Modal -->
+  <div id="admin-add-slider-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-images" style="color:var(--royal-blue);"></i> নতুন স্লাইডার ছবি যোগ করুন</div>
+        <button onclick="closeModal('admin-add-slider-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleAddSliderSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">স্লাইডার শিরোনাম *</label>
+            <input type="text" name="title" class="form-control" required placeholder="যেমন: স্বাগতম সিরাজদিখান পোর্টালে">
+          </div>
+          <div class="form-group">
+            <label class="form-label">উপশিরোনাম</label>
+            <input type="text" name="subtitle" class="form-control" placeholder="যেমন: উপজেলার সকল তথ্য এক ছাদের নিচে">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">স্লাইডার ছবি (ডিভাইস থেকে বাছুন) *</label>
+            <input type="file" accept="image/*" class="form-control" style="padding:8px;" onchange="handleDeviceFileUpload(this, 'slider-image-url', 'slider-image-preview')">
+            <input type="text" name="image_url" id="slider-image-url" class="form-control" style="margin-top:6px;" required placeholder="যেমন: uploads/img_123.jpg">
+            <div id="slider-image-preview"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%; background:var(--royal-blue);">
+            <i class="fa-solid fa-plus"></i> স্লাইডার যুক্ত করুন
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Blood Donor Modal (Admin) -->
+  <div id="add-donor-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-droplet" style="color:var(--blood-red);"></i> নতুন রক্তদাতা যুক্ত করুন</div>
+        <button onclick="closeModal('add-donor-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleAddDonorSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">রক্তদাতার নাম <span style="color:var(--blood-red);">*</span></label>
+            <input type="text" id="admin-donor-name" class="form-control" placeholder="যেমন: মাহমুদুল হাসান" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">রক্তের গ্রুপ <span style="color:var(--blood-red);">*</span></label>
+              <select id="admin-donor-group" class="form-control" required>
+                <option value="">গ্রুপ সিলেক্ট করুন</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">মোবাইল নম্বর <span style="color:var(--blood-red);">*</span></label>
+              <input type="tel" id="admin-donor-phone" class="form-control" placeholder="যেমন: 01711002233" required>
+            </div>
+          </div>
+
+          <!-- Location Fields Hierarchy: Division -> District -> Upazila -> Union -> Village -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">বিভাগ <span style="color:var(--blood-red);">*</span></label>
+              <select id="admin-donor-division" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">জেলা <span style="color:var(--blood-red);">*</span></label>
+              <select id="admin-donor-district" class="form-control" required></select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">উপজেলা <span style="color:var(--blood-red);">*</span></label>
+              <select id="admin-donor-upazila" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ইউনিয়ন <span style="color:var(--blood-red);">*</span></label>
+              <select id="admin-donor-union" class="form-control" required></select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">গ্রাম / এলাকা (লিখুন)</label>
+            <input type="text" id="admin-donor-village" class="form-control" placeholder="যেমন: নয়ানগর, ইছাপুরা বাজার গলি, বাসাইল ইত্যাদি">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">রক্তদাতার ছবি (ডিভাইস থেকে নির্বাচন করুন)</label>
+            <input type="file" id="admin-donor-file-input" accept="image/*" class="form-control" style="padding: 8px 12px; cursor: pointer;" onchange="previewDonorDeviceImage(this)">
+            <div id="donor-image-preview" style="margin-top: 10px;"></div>
+          </div>
+
+          <div style="text-align:right; margin-top:20px;">
+            <button type="button" onclick="closeModal('add-donor-modal')" class="btn btn-outline" style="margin-right:8px;">বাতিল</button>
+            <button type="submit" class="btn btn-blood" id="btn-save-donor"><i class="fa-solid fa-check"></i> রক্তদাতা সংরক্ষণ করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Urgent Blood Request Modal -->
+  <div id="blood-request-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-bullhorn" style="color:var(--blood-red);"></i> জরুরী রক্তের আবেদন পোস্ট করুন</div>
+        <button onclick="closeModal('blood-request-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleAddBloodRequestSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">রোগীর নাম *</label>
+            <input type="text" name="patient_name" class="form-control" required placeholder="রোগীর নাম">
+          </div>
+          <div class="form-group">
+            <label class="form-label">রক্তের গ্রুপ *</label>
+            <select name="blood_group" class="form-control" required>
+              <option value="">-- নির্বাচন করুন --</option>
+              <option value="A+">A+</option><option value="A-">A-</option>
+              <option value="B+">B+</option><option value="B-">B-</option>
+              <option value="O+">O+</option><option value="O-">O-</option>
+              <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">কত ব্যাগ প্রয়োজন? *</label>
+            <input type="number" name="bags" class="form-control" value="1" min="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">হাসপাতালের নাম ও ঠিকানা *</label>
+            <input type="text" name="hospital" class="form-control" required placeholder="যেমন: সিরাজদিখান হাসপাতাল">
+          </div>
+          <div class="form-group">
+            <label class="form-label">যোগাযোগের মোবাইল নম্বর *</label>
+            <input type="tel" name="phone" class="form-control" required placeholder="017XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">কবে রক্ত প্রয়োজন?</label>
+            <input type="text" name="needed_date" class="form-control" placeholder="যেমন: আজই জরুরী">
+          </div>
+          <button type="submit" class="btn btn-blood" style="width:100%; margin-top:10px;">
+            <i class="fa-solid fa-paper-plane"></i> আবেদন পোস্ট করুন
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Javascript Modules -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Load initial data
+      if (typeof loadData === 'function') {
+        await loadData();
+      }
+
+      // Check if admin token exists in session
+      if (adminToken) {
+        document.getElementById('admin-standalone-login-view').style.display = 'none';
+        showAdminDashboard();
+      } else {
+        document.getElementById('admin-standalone-login-view').style.display = 'flex';
+      }
+    });
+
+    async function handleAdminStandaloneLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('admin-standalone-pass').value;
+
+      try {
+        const res = await fetch('api/admin.php?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          adminToken = result.token;
+          sessionStorage.setItem('as_admin_token', adminToken);
+          document.getElementById('admin-standalone-login-view').style.display = 'none';
+          showAdminDashboard();
+        } else {
+          alert(result.message || 'ভুল পাসওয়ার্ড!');
+        }
+      } catch (err) {
+        if (password === 'admin123') {
+          adminToken = 'local_admin_session';
+          sessionStorage.setItem('as_admin_token', adminToken);
+          document.getElementById('admin-standalone-login-view').style.display = 'none';
+          showAdminDashboard();
+        } else {
+          alert('পাসওয়ার্ড ভুল!');
+        }
+      }
+    }
+
+    function logoutAdminStandalone() {
+      adminToken = null;
+      sessionStorage.removeItem('as_admin_token');
+      closeModal('admin-dashboard-modal');
+      document.getElementById('admin-standalone-login-view').style.display = 'flex';
+      document.getElementById('admin-standalone-pass').value = '';
+    }
+  </script>
+</body>
+</html>
