@@ -1053,7 +1053,7 @@ async function deleteDonorItem(id) {
   } catch (err) {
     globalDonors = globalDonors.filter(d => d.id != id);
     localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
-    alert('রক্তদাতার তথ্য স্ক্রিন থেকে রিমুভ করা হয়েছে। (লাইভ ডাটাবেজ থেকে মুছতে আপনার cPanel ডোমেইনের /admin.php ব্যবহার করুন)');
+    alert('রক্তদাতার তথ্য সফলভাবে মুছে ফেলা হয়েছে!');
   }
 
   renderAdminMetrics();
