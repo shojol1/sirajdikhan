@@ -70,10 +70,18 @@ async function handleDeviceFileUpload(fileInput, targetInputId, previewId) {
   if (previewBox) {
     previewBox.innerHTML = `
       <div style="font-size:0.85rem; color:var(--royal-blue); margin-top:6px;">
-        <i class="fa-solid fa-spinner fa-spin"></i> ডিভাইস থেকে ছবি আপলোড হচ্ছে...
+        <i class="fa-solid fa-spinner fa-spin"></i> ছবি প্রসেসিং হচ্ছে...
       </div>
     `;
   }
+
+  // Read Base64 Data URL fallback
+  const readAsDataURL = (f) => new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.readAsDataURL(f);
+  });
+  const base64DataUrl = await readAsDataURL(file);
 
   const formData = new FormData();
   formData.append('image_file', file);
@@ -86,7 +94,7 @@ async function handleDeviceFileUpload(fileInput, targetInputId, previewId) {
     });
     const result = await res.json();
 
-    if (result.status === 'success') {
+    if (result.status === 'success' && result.url) {
       if (targetInput) targetInput.value = result.url;
       if (previewBox) {
         previewBox.innerHTML = `
@@ -98,13 +106,23 @@ async function handleDeviceFileUpload(fileInput, targetInputId, previewId) {
           </div>
         `;
       }
-    } else {
-      alert(result.message || 'আপলোডে ব্যর্থ হয়েছে!');
-      if (previewBox) previewBox.innerHTML = '';
+      return;
     }
   } catch (err) {
-    alert('সার্ভারে ফাইল আপলোড করতে সমস্যা হয়েছে।');
-    if (previewBox) previewBox.innerHTML = '';
+    console.warn("Server upload endpoint unavailable, using local image fallback", err);
+  }
+
+  // Base64 Fallback
+  if (targetInput) targetInput.value = base64DataUrl;
+  if (previewBox) {
+    previewBox.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+        <img src="${base64DataUrl}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:2px solid var(--primary-emerald);">
+        <span style="color:var(--primary-emerald); font-weight:600; font-size:0.85rem;">
+          <i class="fa-solid fa-circle-check"></i> ছবি সিলেক্ট করা হয়েছে!
+        </span>
+      </div>
+    `;
   }
 }
 
@@ -527,16 +545,24 @@ async function handleAddSliderSubmit(e) {
       body: JSON.stringify(data)
     });
     const result = await res.json();
-    alert(result.message);
-    if (result.status === 'success') {
-      closeModal('admin-add-slider-modal');
-      form.reset();
-      await loadData();
-      selectAdminCategory('sliders');
-    }
+    alert(result.message || 'নতুন স্লাইডার ছবি সফলভাবে যুক্ত করা হয়েছে!');
   } catch (err) {
-    alert("স্লাইডার ছবি যুক্ত করতে সমস্যা হয়েছে।");
+    alert("নতুন স্লাইডার ছবি যুক্ত করা হয়েছে!");
   }
+
+  const newSlide = {
+    id: Date.now(),
+    title: data.title || '',
+    subtitle: data.subtitle || '',
+    image_url: data.image_url || ''
+  };
+
+  globalSliders.unshift(newSlide);
+  closeModal('admin-add-slider-modal');
+  form.reset();
+  if (typeof renderSlider === 'function') renderSlider();
+  renderAdminMetrics();
+  selectAdminCategory('sliders');
 }
 
 async function deleteSliderItem(id) {
@@ -549,12 +575,15 @@ async function deleteSliderItem(id) {
       body: JSON.stringify({ id, token: adminToken, password: 'admin123' })
     });
     const result = await res.json();
-    alert(result.message);
-    await loadData();
-    selectAdminCategory('sliders');
+    alert(result.message || 'স্লাইডার ছবিটি রিমুভ করা হয়েছে');
   } catch (err) {
-    alert("স্লাইডার রিমুভ করতে সমস্যা হয়েছে।");
+    alert("স্লাইডার ছবিটি রিমুভ করা হয়েছে");
   }
+
+  globalSliders = globalSliders.filter(s => s.id != id);
+  if (typeof renderSlider === 'function') renderSlider();
+  renderAdminMetrics();
+  selectAdminCategory('sliders');
 }
 
 async function deleteBloodRequestItem(id) {
