@@ -52,19 +52,32 @@ async function loadData() {
     `;
   }
 
+  // Load custom local cache first
+  const cachedSliders = localStorage.getItem('as_sliders_cache');
+  if (cachedSliders !== null) {
+    try { globalSliders = JSON.parse(cachedSliders); } catch(e){}
+  }
+  const cachedListings = localStorage.getItem('as_listings_cache');
+  if (cachedListings !== null) {
+    try { globalListings = JSON.parse(cachedListings); } catch(e){}
+  }
+  const cachedDonors = localStorage.getItem('as_donors_cache');
+  if (cachedDonors !== null) {
+    try { globalDonors = JSON.parse(cachedDonors); } catch(e){}
+  }
+
   try {
     const res = await fetch('api/get_data.php');
     const data = await res.json();
 
     if (data.status === 'success') {
       globalCategories = data.categories || [];
-      globalListings = data.listings || [];
-      globalSliders = data.sliders || [];
-      globalDonors = Array.isArray(data.donors) ? data.donors : [];
-      globalBloodRequests = data.blood_requests || [];
+      if (data.listings && data.listings.length > 0 && !cachedListings) globalListings = data.listings;
+      if (data.sliders && data.sliders.length > 0 && !cachedSliders) globalSliders = data.sliders;
+      if (Array.isArray(data.donors) && data.donors.length > 0 && !cachedDonors) globalDonors = data.donors;
+      if (data.blood_requests) globalBloodRequests = data.blood_requests;
 
       localStorage.setItem('as_has_loaded_db', 'true');
-      localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
 
       renderSlider();
       renderUrgentNotice();
@@ -82,17 +95,30 @@ async function loadData() {
 function showFallbackUI() {
   globalCategories = typeof DEFAULT_CATEGORIES !== 'undefined' ? DEFAULT_CATEGORIES : [];
   
+  const cachedSliders = localStorage.getItem('as_sliders_cache');
+  if (cachedSliders !== null) {
+    try { globalSliders = JSON.parse(cachedSliders); } catch(e){}
+  } else if (typeof DEFAULT_SLIDERS !== 'undefined') {
+    globalSliders = DEFAULT_SLIDERS;
+  }
+
+  const cachedListings = localStorage.getItem('as_listings_cache');
+  if (cachedListings !== null) {
+    try { globalListings = JSON.parse(cachedListings); } catch(e){}
+  }
+
   const cachedDonors = localStorage.getItem('as_donors_cache');
   const hasLoadedDb = localStorage.getItem('as_has_loaded_db');
 
   if (cachedDonors !== null) {
-    globalDonors = JSON.parse(cachedDonors);
+    try { globalDonors = JSON.parse(cachedDonors); } catch(e){}
   } else if (hasLoadedDb === 'true') {
     globalDonors = [];
   } else {
     globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
   }
 
+  renderSlider();
   renderCategories();
   renderDonorDirectory('all');
 }
@@ -388,10 +414,7 @@ function openCategoryModal(category) {
     bodyEl.innerHTML = `
       <div style="text-align:center; padding: 40px 10px; color: var(--text-muted);">
         <i class="fa-solid fa-folder-open fa-3x" style="margin-bottom:12px; opacity:0.4;"></i>
-        <p>এই ক্যাটাগরিতে এখনও কোনো সদস্য নিবন্ধিত হননি।</p>
-        <button onclick="closeModal('category-modal'); openAdminModal();" class="btn btn-outline" style="margin-top:15px;">
-          <i class="fa-solid fa-plus"></i> নতুন সদস্য যোগ করুন (অ্যাডমিন)
-        </button>
+        <p>এই ক্যাটাগরিতে এখনও কোনো তথ্য যোগ করা হয়নি।</p>
       </div>
     `;
   } else {

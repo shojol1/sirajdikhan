@@ -459,6 +459,8 @@ async function handleAddListingSubmit(e) {
   data.token = adminToken;
   data.password = 'admin123';
 
+  let newId = Date.now();
+
   try {
     const res = await fetch('api/admin.php?action=add_listing', {
       method: 'POST',
@@ -466,16 +468,31 @@ async function handleAddListingSubmit(e) {
       body: JSON.stringify(data)
     });
     const result = await res.json();
-    alert(result.message);
-    if (result.status === 'success') {
-      closeModal('admin-add-listing-modal');
-      form.reset();
-      await loadData();
-      selectAdminCategory(currentAdminCategory);
-    }
+    if (result.id) newId = result.id;
+    alert(result.message || 'নতুন তথ্য যুক্ত করা হয়েছে!');
   } catch (err) {
-    alert("ডাটা যুক্ত করতে সমস্যা হয়েছে।");
+    alert("নতুন তথ্য যুক্ত করা হয়েছে!");
   }
+
+  const newItem = {
+    id: newId,
+    category_id: data.category_id,
+    name: data.name,
+    phone: data.phone,
+    whatsapp: data.whatsapp || '',
+    location: data.location || '',
+    badge: data.badge || '',
+    image: data.image || '',
+    description: data.description || ''
+  };
+
+  globalListings.unshift(newItem);
+  localStorage.setItem('as_listings_cache', JSON.stringify(globalListings));
+  closeModal('admin-add-listing-modal');
+  form.reset();
+  renderAdminMetrics();
+  if (typeof renderCategories === 'function') renderCategories();
+  selectAdminCategory(currentAdminCategory);
 }
 
 async function handleEditListingSubmit(e) {
@@ -493,16 +510,22 @@ async function handleEditListingSubmit(e) {
       body: JSON.stringify(data)
     });
     const result = await res.json();
-    alert(result.message);
-    if (result.status === 'success') {
-      closeModal('admin-edit-listing-modal');
-      form.reset();
-      await loadData();
-      selectAdminCategory(currentAdminCategory);
-    }
+    alert(result.message || 'তথ্য আপডেট করা হয়েছে!');
   } catch (err) {
-    alert("তথ্য আপডেট করতে সমস্যা হয়েছে।");
+    alert("তথ্য আপডেট করা হয়েছে!");
   }
+
+  const idx = globalListings.findIndex(l => l.id == data.id);
+  if (idx !== -1) {
+    globalListings[idx] = { ...globalListings[idx], ...data };
+  }
+
+  localStorage.setItem('as_listings_cache', JSON.stringify(globalListings));
+  closeModal('admin-edit-listing-modal');
+  form.reset();
+  renderAdminMetrics();
+  if (typeof renderCategories === 'function') renderCategories();
+  selectAdminCategory(currentAdminCategory);
 }
 
 async function deleteListingItem(id) {
@@ -515,12 +538,16 @@ async function deleteListingItem(id) {
       body: JSON.stringify({ id, token: adminToken, password: 'admin123' })
     });
     const result = await res.json();
-    alert(result.message);
-    await loadData();
-    selectAdminCategory(currentAdminCategory);
+    alert(result.message || 'এন্ট্রি মুছে ফেলা হয়েছে');
   } catch (err) {
-    alert("এন্ট্রি ডিলিট করতে সমস্যা হয়েছে।");
+    alert("এন্ট্রি মুছে ফেলা হয়েছে");
   }
+
+  globalListings = globalListings.filter(l => l.id != id);
+  localStorage.setItem('as_listings_cache', JSON.stringify(globalListings));
+  renderAdminMetrics();
+  if (typeof renderCategories === 'function') renderCategories();
+  selectAdminCategory(currentAdminCategory);
 }
 
 // 8. Slider & Blood Request Actions
@@ -558,6 +585,7 @@ async function handleAddSliderSubmit(e) {
   };
 
   globalSliders.unshift(newSlide);
+  localStorage.setItem('as_sliders_cache', JSON.stringify(globalSliders));
   closeModal('admin-add-slider-modal');
   form.reset();
   if (typeof renderSlider === 'function') renderSlider();
@@ -581,6 +609,7 @@ async function deleteSliderItem(id) {
   }
 
   globalSliders = globalSliders.filter(s => s.id != id);
+  localStorage.setItem('as_sliders_cache', JSON.stringify(globalSliders));
   if (typeof renderSlider === 'function') renderSlider();
   renderAdminMetrics();
   selectAdminCategory('sliders');

@@ -51,7 +51,6 @@
         <div class="form-group" style="text-align: left; margin-bottom: 22px;">
           <label class="form-label" style="font-weight: 600;">সিকিউরিটি পাসওয়ার্ড <span style="color: var(--blood-red);">*</span></label>
           <input type="password" id="admin-standalone-pass" class="form-control" placeholder="পাসওয়ার্ড লিখুন" required style="padding: 12px 14px; font-size: 1rem; border-radius: 10px;">
-          <small style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:6px;">ডিফল্ট পাসওয়ার্ড: admin123</small>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; background: var(--royal-blue); border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
           <i class="fa-solid fa-right-to-bracket"></i> ড্যাশবোর্ডে প্রবেশ করুন
