@@ -97,12 +97,13 @@ function showFallbackUI() {
   }
 
   const cachedDonors = localStorage.getItem('as_donors_cache');
-  const hasLoadedDb = localStorage.getItem('as_has_loaded_db');
-
   if (cachedDonors !== null) {
-    try { globalDonors = JSON.parse(cachedDonors); } catch(e){}
-  } else if (hasLoadedDb === 'true') {
-    globalDonors = [];
+    try {
+      const parsed = JSON.parse(cachedDonors);
+      globalDonors = (Array.isArray(parsed) && parsed.length > 0) ? parsed : (typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : []);
+    } catch(e) {
+      globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
+    }
   } else {
     globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
   }
