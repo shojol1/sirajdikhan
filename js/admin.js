@@ -1045,15 +1045,15 @@ async function deleteDonorItem(id) {
     });
     const result = await res.json();
     if (result.status === 'success') {
-      alert('রক্তদাতার তথ্য সফলভাবে ডাটাবেজ থেকে মুছে ফেলা হয়েছে');
+      alert('রক্তদাতার তথ্য সফলভাবে ডাটাবেজ থেকে মুছে ফেলা হয়েছে!');
       await loadData();
     } else {
-      globalDonors = globalDonors.filter(d => d.id != id);
-      localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
+      alert(result.message || 'ডাটাবেজ থেকে মুছতে সমস্যা হয়েছে');
     }
   } catch (err) {
     globalDonors = globalDonors.filter(d => d.id != id);
     localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
+    alert('রক্তদাতার তথ্য স্ক্রিন থেকে রিমুভ করা হয়েছে। (লাইভ ডাটাবেজ থেকে মুছতে আপনার cPanel ডোমেইনের /admin.php ব্যবহার করুন)');
   }
 
   renderAdminMetrics();
