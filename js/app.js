@@ -96,17 +96,8 @@ function showFallbackUI() {
     try { globalListings = JSON.parse(cachedListings); } catch(e){}
   }
 
-  const cachedDonors = localStorage.getItem('as_donors_cache');
-  if (cachedDonors !== null) {
-    try {
-      const parsed = JSON.parse(cachedDonors);
-      globalDonors = (Array.isArray(parsed) && parsed.length > 0) ? parsed : (typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : []);
-    } catch(e) {
-      globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
-    }
-  } else {
-    globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
-  }
+  // Always use DEFAULT_DONORS (6 donors) as base fallback when offline/unreachable
+  globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
 
   renderSlider();
   renderCategories();
