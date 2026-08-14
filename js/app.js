@@ -60,8 +60,11 @@ async function loadData() {
       globalCategories = data.categories || [];
       globalListings = data.listings || [];
       globalSliders = data.sliders || [];
-      globalDonors = data.donors || [];
+      globalDonors = Array.isArray(data.donors) ? data.donors : [];
       globalBloodRequests = data.blood_requests || [];
+
+      localStorage.setItem('as_has_loaded_db', 'true');
+      localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
 
       renderSlider();
       renderUrgentNotice();
@@ -78,7 +81,18 @@ async function loadData() {
 
 function showFallbackUI() {
   globalCategories = typeof DEFAULT_CATEGORIES !== 'undefined' ? DEFAULT_CATEGORIES : [];
-  globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
+  
+  const cachedDonors = localStorage.getItem('as_donors_cache');
+  const hasLoadedDb = localStorage.getItem('as_has_loaded_db');
+
+  if (cachedDonors !== null) {
+    globalDonors = JSON.parse(cachedDonors);
+  } else if (hasLoadedDb === 'true') {
+    globalDonors = [];
+  } else {
+    globalDonors = typeof DEFAULT_DONORS !== 'undefined' ? DEFAULT_DONORS : [];
+  }
+
   renderCategories();
   renderDonorDirectory('all');
 }
@@ -326,7 +340,7 @@ function renderCategories(filterQuery = '') {
       card.setAttribute('data-section', cat.section);
       card.onclick = () => {
         if (cat.slug === 'blood-donor' || cat.slug === 'blood-donors' || cat.name_bn.includes('ডোনার') || cat.name_bn.includes('রক্তদাতা')) {
-          window.location.href = 'donors.php';
+          window.location.href = 'donors.html';
         } else {
           openCategoryModal(cat);
         }
@@ -358,7 +372,7 @@ function setSectionFilter(section, btnEl) {
 // 6. Category Detail Modal (Includes Circular Avatar & Fallback Icon)
 function openCategoryModal(category) {
   if (category.slug === 'blood-donor' || category.slug === 'blood-donors' || category.name_bn.includes('ডোনার') || category.name_bn.includes('রক্তদাতা')) {
-    window.location.href = 'donors.php';
+    window.location.href = 'donors.html';
     return;
   }
 

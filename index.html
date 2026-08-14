@@ -43,7 +43,7 @@
       </a>
 
       <div class="nav-actions">
-        <a href="donors.php" class="btn btn-blood">
+        <a href="donors.html" class="btn btn-blood">
           <i class="fa-solid fa-droplet"></i> রক্তদাতা খুঁজুন
         </a>
         <button onclick="toggleTheme()" class="theme-toggle-btn" title="থিম পরিবর্তন করুন">

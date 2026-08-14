@@ -224,6 +224,36 @@ if ($action === 'delete_donor') {
     }
 }
 
+// 10b. Edit Blood Donor
+if ($action === 'edit_donor') {
+    $id = (int)($input['id'] ?? 0);
+    $name = trim($input['name'] ?? '');
+    $bloodGroup = trim($input['blood_group'] ?? '');
+    $phone = trim($input['phone'] ?? '');
+    $division = trim($input['division'] ?? 'ঢাকা');
+    $district = trim($input['district'] ?? 'মুন্সীগঞ্জ');
+    $upazila = trim($input['upazila'] ?? 'সিরাজদিখান');
+    $unionName = trim($input['union_name'] ?? 'সিরাজদিখান সদর');
+    $village = trim($input['village'] ?? '');
+    $image = trim($input['image'] ?? '');
+
+    if ($id <= 0 || empty($name) || empty($bloodGroup) || empty($phone)) {
+        echo json_encode(['status' => 'error', 'message' => 'রক্তদাতার নাম, রক্তের গ্রুপ এবং ফোন নম্বর আবশ্যক!']);
+        exit();
+    }
+
+    if (!empty($image)) {
+        $stmt = $pdo->prepare("UPDATE blood_donors SET name = ?, blood_group = ?, phone = ?, division = ?, district = ?, upazila = ?, union_name = ?, village = ?, image = ? WHERE id = ?");
+        $stmt->execute([$name, $bloodGroup, $phone, $division, $district, $upazila, $unionName, $village, $image, $id]);
+    } else {
+        $stmt = $pdo->prepare("UPDATE blood_donors SET name = ?, blood_group = ?, phone = ?, division = ?, district = ?, upazila = ?, union_name = ?, village = ? WHERE id = ?");
+        $stmt->execute([$name, $bloodGroup, $phone, $division, $district, $upazila, $unionName, $village, $id]);
+    }
+
+    echo json_encode(['status' => 'success', 'message' => 'রক্তদাতার তথ্য সফলভাবে আপডেট করা হয়েছে!']);
+    exit();
+}
+
 // 11. Add Urgent Blood Request (Admin)
 if ($action === 'add_blood_request') {
     $patientName = trim($input['patient_name'] ?? '');

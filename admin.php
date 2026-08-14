@@ -371,6 +371,80 @@
     </div>
   </div>
 
+  <!-- Edit Blood Donor Modal (Admin) -->
+  <div id="edit-donor-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-pen-to-square" style="color:var(--royal-blue);"></i> রক্তদাতার তথ্য সম্পাদনা (Edit Donor)</div>
+        <button onclick="closeModal('edit-donor-modal')" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleEditDonorSubmit(event)">
+          <input type="hidden" id="edit-donor-id">
+          
+          <div class="form-group">
+            <label class="form-label">রক্তদাতার নাম <span style="color:var(--blood-red);">*</span></label>
+            <input type="text" id="edit-donor-name" class="form-control" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">রক্তের গ্রুপ <span style="color:var(--blood-red);">*</span></label>
+              <select id="edit-donor-group" class="form-control" required>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">মোবাইল নম্বর <span style="color:var(--blood-red);">*</span></label>
+              <input type="tel" id="edit-donor-phone" class="form-control" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">বিভাগ *</label>
+              <select id="edit-donor-division" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">জেলা *</label>
+              <select id="edit-donor-district" class="form-control" required></select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">উপজেলা *</label>
+              <select id="edit-donor-upazila" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ইউনিয়ন *</label>
+              <select id="edit-donor-union" class="form-control" required></select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">গ্রাম / এলাকা</label>
+            <input type="text" id="edit-donor-village" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">নতুন ছবি (ডিভাইস থেকে পছন্দ করুন)</label>
+            <input type="file" id="edit-donor-file-input" accept="image/*" class="form-control" style="padding: 8px 12px; cursor: pointer;">
+            <div id="edit-donor-image-preview" style="margin-top: 10px;"></div>
+          </div>
+
+          <div style="text-align:right; margin-top:20px;">
+            <button type="button" onclick="closeModal('edit-donor-modal')" class="btn btn-outline" style="margin-right:8px;">বাতিল</button>
+            <button type="submit" class="btn btn-primary" style="background:var(--royal-blue);"><i class="fa-solid fa-check"></i> তথ্য আপডেট করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Urgent Blood Request Modal -->
   <div id="blood-request-modal" class="modal-overlay">
     <div class="modal-box">

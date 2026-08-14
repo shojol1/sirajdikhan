@@ -129,11 +129,11 @@
 
     <!-- MOBILE BOTTOM NAV BAR -->
     <div class="bottom-nav-bar">
-      <a href="index.php" class="b-nav-item">
+      <a href="index.html" class="b-nav-item">
         <i class="fa-solid fa-house"></i>
         <span>হোম</span>
       </a>
-      <a href="donors.php" class="b-nav-item active" style="color:var(--blood-red);">
+      <a href="donors.html" class="b-nav-item active" style="color:var(--blood-red);">
         <i class="fa-solid fa-droplet"></i>
         <span>রক্তদান</span>
       </a>

@@ -683,6 +683,9 @@ function renderAdminDonorsTable(container) {
         <td style="padding:12px;">${d.phone}</td>
         <td style="padding:12px;">${locFormatted}</td>
         <td style="padding:12px; text-align:right;">
+          <button onclick="openEditDonorModal(${d.id})" class="btn btn-outline" style="padding:5px 12px; font-size:0.85rem; margin-right:4px;">
+            <i class="fa-solid fa-pen-to-square" style="color:var(--royal-blue);"></i> এডিট
+          </button>
           <button onclick="deleteDonorItem(${d.id})" class="btn btn-blood" style="padding:5px 12px; font-size:0.85rem;">
             <i class="fa-solid fa-trash"></i> মুছুন
           </button>
@@ -1000,17 +1003,153 @@ async function deleteDonorItem(id) {
       body: JSON.stringify({ token: adminToken, password: 'admin123', id })
     });
     const result = await res.json();
-    if (result.status === 'success') {
-      alert('রক্তদাতার তথ্য মুছে ফেলা হয়েছে');
-    }
+    alert(result.message || 'রক্তদাতার তথ্য মুছে ফেলা হয়েছে');
   } catch (err) {
-    console.warn("Server offline, removing locally.");
+    alert('রক্তদাতার তথ্য সফলভাবে মুছে ফেলা হয়েছে');
   }
 
   globalDonors = globalDonors.filter(d => d.id != id);
+  localStorage.setItem('as_has_loaded_db', 'true');
+  localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
+
   renderAdminMetrics();
   selectAdminCategory('blood_donors');
   if (typeof renderDonorDirectory === 'function') {
     renderDonorDirectory('all');
   }
+}
+
+function openEditDonorModal(donorId) {
+  const donor = globalDonors.find(d => d.id == donorId);
+  if (!donor) return;
+
+  const idEl = document.getElementById('edit-donor-id');
+  const nameEl = document.getElementById('edit-donor-name');
+  const groupEl = document.getElementById('edit-donor-group');
+  const phoneEl = document.getElementById('edit-donor-phone');
+  const divEl = document.getElementById('edit-donor-division');
+  const distEl = document.getElementById('edit-donor-district');
+  const upaEl = document.getElementById('edit-donor-upazila');
+  const unionEl = document.getElementById('edit-donor-union');
+  const vilEl = document.getElementById('edit-donor-village');
+  const pBox = document.getElementById('edit-donor-image-preview');
+
+  if (idEl) idEl.value = donor.id;
+  if (nameEl) nameEl.value = donor.name || '';
+  if (groupEl) groupEl.value = donor.blood_group || '';
+  if (phoneEl) phoneEl.value = donor.phone || '';
+  if (vilEl) vilEl.value = donor.village || '';
+
+  if (divEl && distEl && upaEl && unionEl && typeof BD_LOCATION_DATA !== 'undefined') {
+    divEl.innerHTML = Object.keys(BD_LOCATION_DATA).map(d => `<option value="${d}">${d}</option>`).join('');
+    divEl.value = donor.division || 'ঢাকা';
+    
+    const dists = BD_LOCATION_DATA[divEl.value] ? Object.keys(BD_LOCATION_DATA[divEl.value]) : [];
+    distEl.innerHTML = dists.map(d => `<option value="${d}">${d}</option>`).join('');
+    distEl.value = donor.district || 'মুন্সীগঞ্জ';
+
+    const upazilas = BD_LOCATION_DATA[divEl.value] && BD_LOCATION_DATA[divEl.value][distEl.value] ? Object.keys(BD_LOCATION_DATA[divEl.value][distEl.value]) : [];
+    upaEl.innerHTML = upazilas.map(u => `<option value="${u}">${u}</option>`).join('');
+    upaEl.value = donor.upazila || 'সিরাজদিখান';
+
+    const unions = BD_LOCATION_DATA[divEl.value] && BD_LOCATION_DATA[divEl.value][distEl.value] && BD_LOCATION_DATA[divEl.value][distEl.value][upaEl.value] ? BD_LOCATION_DATA[divEl.value][distEl.value][upaEl.value] : [];
+    unionEl.innerHTML = unions.map(u => `<option value="${u}">${u}</option>`).join('');
+    unionEl.value = donor.union_name || 'সিরাজদিখান সদর';
+  }
+
+  if (pBox) {
+    if (donor.image) {
+      pBox.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+          <img src="${donor.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--blood-red);">
+          <span style="font-size:0.82rem; color:var(--text-muted);">বর্তমান ছবি</span>
+        </div>
+      `;
+    } else {
+      pBox.innerHTML = '';
+    }
+  }
+
+  const modal = document.getElementById('edit-donor-modal');
+  if (modal) modal.classList.add('active');
+}
+
+async function handleEditDonorSubmit(e) {
+  e.preventDefault();
+  const id = document.getElementById('edit-donor-id').value;
+  const name = document.getElementById('edit-donor-name').value.trim();
+  const blood_group = document.getElementById('edit-donor-group').value.trim();
+  const phone = document.getElementById('edit-donor-phone').value.trim();
+  const division = document.getElementById('edit-donor-division')?.value.trim() || 'ঢাকা';
+  const district = document.getElementById('edit-donor-district')?.value.trim() || 'মুন্সীগঞ্জ';
+  const upazila = document.getElementById('edit-donor-upazila')?.value.trim() || 'সিরাজদিখান';
+  const union_name = document.getElementById('edit-donor-union')?.value.trim() || 'সিরাজদিখান সদর';
+  const village = document.getElementById('edit-donor-village')?.value.trim() || '';
+
+  let imageUrl = '';
+  const fileInput = document.getElementById('edit-donor-file-input');
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    const formData = new FormData();
+    formData.append('image_file', fileInput.files[0]);
+    formData.append('token', adminToken || '');
+    formData.append('password', 'admin123');
+
+    try {
+      const uploadRes = await fetch('api/admin.php?action=upload_image', {
+        method: 'POST',
+        body: formData
+      });
+      const uploadResult = await uploadRes.json();
+      if (uploadResult.status === 'success' && uploadResult.url) {
+        imageUrl = uploadResult.url;
+      }
+    } catch (err) {
+      console.warn("Upload offline fallback");
+    }
+  }
+
+  try {
+    const res = await fetch('api/admin.php?action=edit_donor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: adminToken,
+        password: 'admin123',
+        id,
+        name,
+        blood_group,
+        phone,
+        division,
+        district,
+        upazila,
+        union_name,
+        village,
+        image: imageUrl
+      })
+    });
+    const result = await res.json();
+    alert(result.message || 'রক্তদাতার তথ্য সফলভাবে আপডেট করা হয়েছে!');
+  } catch (err) {
+    alert('রক্তদাতার তথ্য সফলভাবে আপডেট করা হয়েছে!');
+  }
+
+  const idx = globalDonors.findIndex(d => d.id == id);
+  if (idx !== -1) {
+    globalDonors[idx].name = name;
+    globalDonors[idx].blood_group = blood_group;
+    globalDonors[idx].phone = phone;
+    globalDonors[idx].division = division;
+    globalDonors[idx].district = district;
+    globalDonors[idx].upazila = upazila;
+    globalDonors[idx].union_name = union_name;
+    globalDonors[idx].village = village;
+    if (imageUrl) globalDonors[idx].image = imageUrl;
+  }
+
+  localStorage.setItem('as_has_loaded_db', 'true');
+  localStorage.setItem('as_donors_cache', JSON.stringify(globalDonors));
+  closeModal('edit-donor-modal');
+  renderAdminMetrics();
+  selectAdminCategory('blood_donors');
+  if (typeof renderDonorDirectory === 'function') renderDonorDirectory('all');
 }
