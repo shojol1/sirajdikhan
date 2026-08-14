@@ -139,8 +139,10 @@ function renderSlider() {
     <div class="slide-item ${idx === 0 ? 'active' : ''}" data-index="${idx}">
       <img src="${s.image_url}" alt="${s.title}" class="slide-image">
       <div class="slide-overlay">
-        <div class="slide-title">${s.title}</div>
-        ${s.subtitle ? `<div class="slide-subtitle">${s.subtitle}</div>` : ''}
+        <div class="slide-overlay-content">
+          <div class="slide-title">${s.title}</div>
+          ${s.subtitle ? `<div class="slide-subtitle">${s.subtitle}</div>` : ''}
+        </div>
       </div>
     </div>
   `).join('');
